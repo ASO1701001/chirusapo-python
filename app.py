@@ -20,7 +20,7 @@ def recognition(token):
             return jsonify({'status': 400, 'message': ["REQUIRED_PARAM"], 'result': None})
         else:
             if file and allow_file(file.filename):
-                print(file)
+                # print(file)
                 filename = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
                 filename = filename + "." + os.path.splitext(file.filename)[1][1:]
                 file.save(os.path.join("./private/cache/", filename))

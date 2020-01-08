@@ -1,3 +1,5 @@
+import os
+
 import face_recognition
 import numpy
 import matplotlib.pyplot as plt
@@ -101,6 +103,9 @@ class Recognition:
 
                         plt.imshow(pil_image)
                         plt.show()
+
+                        if os.path.exists(upload_path + filename):
+                            os.remove(upload_path + filename)
 
                         _app.close()
 
