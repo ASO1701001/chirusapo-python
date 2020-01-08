@@ -2,7 +2,6 @@ import os
 
 import face_recognition
 import numpy
-import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw
 from flask import jsonify
 
@@ -45,7 +44,6 @@ class Recognition:
 
                 face_model = []
                 for face in child_face:
-                    # print(face)
                     face_model.append({
                         "type": "child",
                         "user_name": face["user_name"],
@@ -53,7 +51,6 @@ class Recognition:
                         "file_path": "./private/child-face/" + face["file_name"]
                     })
                 for face in friend_face:
-                    # print(face)
                     face_model.append({
                         "type": "friend",
                         "user_name": face["user_name"],
@@ -74,12 +71,12 @@ class Recognition:
                             known_face_encodings.append(face_encodings)
                             known_face_names.append(face["user_name"])
 
-                    print("Known Face Len: ", len(known_face_encodings))
                     if len(known_face_encodings) == 0:
                         return jsonify({'status': 400, 'message': ["NOTFOUND_KNOWN_FACE"], 'result': None})
                     else:
                         pil_image = Image.fromarray(unknown_image)
                         draw = ImageDraw.Draw(pil_image)
+                        match_name = []
                         for (top, right, bottom, left), unknown_face_encoding \
                                 in zip(unknown_face_locations, unknown_face_encodings):
                             draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255), width=10)
@@ -89,24 +86,21 @@ class Recognition:
                                 unknown_face_encoding,
                                 tolerance=0.5
                             )
-                            print(matches)
 
                             face_distances = face_recognition.face_distance(known_face_encodings, unknown_face_encoding)
-                            print(face_distances)
                             best_match_index = numpy.argmin(face_distances)
-                            print(best_match_index)
                             if matches[best_match_index]:
-                                name = known_face_names[best_match_index]
+                                match_name.append(known_face_names[best_match_index])
                                 draw.rectangle(((left, top), (right, bottom)), outline=(255, 0, 0), width=10)
 
-                                print(name)
-
-                        plt.imshow(pil_image)
-                        plt.show()
+                        # plt.imshow(pil_image)
+                        # plt.show()
 
                         if os.path.exists(upload_path + filename):
                             os.remove(upload_path + filename)
 
+                        pil_image.save(upload_path + filename)
+
                         _app.close()
 
-                        return jsonify({"face_model": face_model})
+                        return jsonify({'status': 200, 'message': None, 'result': {'match_user': match_name}})
