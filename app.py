@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
-import random, string
+import random
+import string
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 
 from static.controller.Recognition import Recognition
 

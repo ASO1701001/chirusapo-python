@@ -4,14 +4,18 @@ import urllib.request
 from datetime import datetime
 
 import mysql.connector
+from flask import jsonify
 
 
 class App:
 
     def connect(self, dictionary=False):
-        self._mysql = mysql.connector.connect(
-            user='root', password='password', host='127.0.0.1', port=33066, database='2019ChiruSapo', charset='utf8')
-        self._cursor = self._mysql.cursor(dictionary=dictionary)
+        try:
+            self._mysql = mysql.connector.connect(
+                user='root', password='password', host='127.0.0.1', port=33066, database='2019ChiruSapo', charset='utf8')
+            self._cursor = self._mysql.cursor(dictionary=dictionary)
+        except mysql.connector.errors.DatabaseError:
+            return jsonify({'status': 400, 'message': ["DATABASE_CONNECTION_ERROR"], 'result': None})
 
     def close(self):
         self._mysql.close()
@@ -64,8 +68,8 @@ class App:
             return
 
         for item in file_list:
-            print(path + item)
-            print(url + item)
+            # print(path + item)
+            # print(url + item)
 
             if not os.path.exists(path + item):
                 res = urllib.request.urlopen(url + item, context=ssl.SSLContext(ssl.PROTOCOL_TLSv1)).read()

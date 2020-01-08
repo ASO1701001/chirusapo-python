@@ -1,6 +1,8 @@
-import numpy
-from flask import jsonify
 import face_recognition
+import numpy
+import matplotlib.pyplot as plt
+from PIL import Image, ImageDraw
+from flask import jsonify
 
 from static.application.App import App
 
@@ -41,7 +43,7 @@ class Recognition:
 
                 face_model = []
                 for face in child_face:
-                    print(face)
+                    # print(face)
                     face_model.append({
                         "type": "child",
                         "user_name": face["user_name"],
@@ -49,7 +51,7 @@ class Recognition:
                         "file_path": "./private/child-face/" + face["file_name"]
                     })
                 for face in friend_face:
-                    print(face)
+                    # print(face)
                     face_model.append({
                         "type": "friend",
                         "user_name": face["user_name"],
@@ -74,8 +76,12 @@ class Recognition:
                     if len(known_face_encodings) == 0:
                         return jsonify({'status': 400, 'message': ["NOTFOUND_KNOWN_FACE"], 'result': None})
                     else:
+                        pil_image = Image.fromarray(unknown_image)
+                        draw = ImageDraw.Draw(pil_image)
                         for (top, right, bottom, left), unknown_face_encoding \
                                 in zip(unknown_face_locations, unknown_face_encodings):
+                            draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255), width=10)
+
                             matches = face_recognition.compare_faces(
                                 known_face_encodings,
                                 unknown_face_encoding,
@@ -89,7 +95,12 @@ class Recognition:
                             print(best_match_index)
                             if matches[best_match_index]:
                                 name = known_face_names[best_match_index]
+                                draw.rectangle(((left, top), (right, bottom)), outline=(255, 0, 0), width=10)
+
                                 print(name)
+
+                        plt.imshow(pil_image)
+                        plt.show()
 
                         _app.close()
 
