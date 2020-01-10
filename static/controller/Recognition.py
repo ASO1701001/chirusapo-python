@@ -12,7 +12,7 @@ class Recognition:
     @staticmethod
     def fire(token, filename):
         _app = App()
-        user_id = _app.getUserId(token)
+        user_id = _app.get_user_id(token)
 
         if not user_id:
             _app.close()
@@ -27,7 +27,7 @@ class Recognition:
                 unknown_face_encodings = face_recognition.face_encodings(unknown_image)
 
                 # child
-                child_face = _app.getChildFace(user_id)
+                child_face = _app.get_child_face(user_id)
                 child_file_list = []
                 for child in child_face:
                     child_file_list.append(child["file_name"])
@@ -35,7 +35,7 @@ class Recognition:
                     _app.download(child_file_list, child=True)
 
                 # friend
-                friend_face = _app.getFriendFace(user_id)
+                friend_face = _app.get_friend_face(user_id)
                 friend_file_list = []
                 for friend in friend_face:
                     friend_file_list.append(friend["file_name"])

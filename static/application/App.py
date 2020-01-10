@@ -1,9 +1,9 @@
 import os
 import ssl
-import urllib.request
 from datetime import datetime
 
 import mysql.connector
+import wget
 from flask import jsonify
 
 
@@ -12,7 +12,8 @@ class App:
     def connect(self, dictionary=False):
         try:
             self._mysql = mysql.connector.connect(
-                user='root', password='password', host='127.0.0.1', port=33066, database='2019ChiruSapo', charset='utf8')
+                user='root', password='password', host='127.0.0.1', port=33066, database='2019ChiruSapo',
+                charset='utf8')
             self._cursor = self._mysql.cursor(dictionary=dictionary)
         except mysql.connector.errors.DatabaseError:
             return jsonify({'status': 400, 'message': ["DATABASE_CONNECTION_ERROR"], 'result': None})
@@ -21,7 +22,7 @@ class App:
         self._mysql.close()
         self._cursor.close()
 
-    def getUserId(self, token):
+    def get_user_id(self, token):
         self.connect()
         now_datetime = datetime.now().strftime("Y-m-d H:i:s")
         self._cursor.execute("SELECT user_id FROM account_user_token WHERE token = %s AND expiration_date > %s",
@@ -33,7 +34,7 @@ class App:
         else:
             return user_id
 
-    def getChildFace(self, user_id):
+    def get_child_face(self, user_id):
         self.connect(dictionary=True)
         query = ("SELECT ac.user_name, cf.file_name "
                  "FROM child_face cf "
@@ -44,7 +45,7 @@ class App:
         self.close()
         return data
 
-    def getFriendFace(self, user_id):
+    def get_friend_face(self, user_id):
         self.connect(dictionary=True)
         query = ("SELECT cf.user_name, cff.file_name "
                  "FROM child_friend_face cff "
@@ -72,6 +73,8 @@ class App:
             # print(url + item)
 
             if not os.path.exists(path + item):
-                res = urllib.request.urlopen(url + item, context=ssl.SSLContext(ssl.PROTOCOL_TLSv1)).read()
-                with open(path + item, mode='wb') as f:
-                    f.write(res)
+                ssl._create_default_https_context = ssl._create_unverified_context
+                wget.download(url + item, path + item)
+                # res = urllib.request.urlopen(url + item, context=ssl.SSLContext(ssl.PROTOCOL_TLSv1)).read()
+                # with open(path + item, mode='wb') as f:
+                #     f.write(res)

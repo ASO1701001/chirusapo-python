@@ -10,6 +10,11 @@ from static.controller.Recognition import Recognition
 app = Flask(__name__)
 
 
+@app.route('/')
+def index():
+    return jsonify({'status': 200, 'message': None, 'result': {'message': "Hello! Flask Framework."}})
+
+
 @app.route('/recognition/<string:token>', methods=["POST"])
 def recognition(token):
     if 'file' not in request.files:
