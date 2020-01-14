@@ -26,7 +26,7 @@ def recognition(token):
         else:
             if file and allow_file(file.filename):
                 # print(file)
-                filename = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
+                filename = random_name(20)
                 filename = filename + "." + os.path.splitext(file.filename)[1][1:]
                 file.save(os.path.join("./private/cache/", filename))
 
@@ -37,6 +37,11 @@ def recognition(token):
 
 def allow_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
+
+
+def random_name(n):
+    rand_list = [random.choice(string.ascii_letters + string.digits) for i in range(n)]
+    return ''.join(rand_list)
 
 
 if __name__ == '__main__':
